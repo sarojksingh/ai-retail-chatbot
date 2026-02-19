@@ -1,0 +1,21 @@
+product_id,name,category,subcategory,description,price,stock,features,sport,gear_type
+1,Nike Air Zoom Pegasus 40,Running,Shoes,Lightweight running shoe with responsive cushioning,120.00,50,"Responsive cushioning, Lightweight, Durable",Running,Gear
+2,Brooks Ghost 15,Running,Shoes,Neutral cushioned running shoe for everyday runs,140.00,45,"Neutral cushioning, Smooth transitions, Reliable",Running,Gear
+3,Adidas Ultraboost 23,Running,Shoes,High-energy return running shoe with boost technology,180.00,30,"Responsive, High-energy return, Comfortable",Running,Gear
+4,ASICS Gel-Kayano 30,Running,Shoes,Premium stability running shoe,160.00,35,"Stability, Comfort, Gel cushioning",Running,Gear
+5,Nike Dri-FIT Running Tee,Running,Clothing,Moisture-wicking t-shirt for running,40.00,100,"Moisture-wicking, Lightweight, Breathable",Running,Clothing
+6,Brooks High Impact Sports Bra,Running,Clothing,Professional sports bra for high-impact activities,80.00,60,"High support, Moisture-wicking, Comfortable",Running,Clothing
+7,Salomon Speedcross 6,Trail Running,Shoes,Aggressive traction trail running shoe,150.00,40,"Aggressive traction, Protective, Lightweight",Trail Running,Gear
+8,Merrell Moab 3,Hiking,Shoes,Comfortable hiking boot with excellent grip,140.00,50,"Cushioned, Grip, Waterproof",Hiking,Gear
+9,Columbia Women's Omni-Tech Jacket,Hiking,Clothing,Waterproof jacket for outdoor adventures,200.00,35,"Waterproof, Breathable, Lightweight",Hiking,Clothing
+10,The North Face Resolve Rain Jacket,Hiking,Clothing,Durable waterproof rain jacket,150.00,45,"Waterproof, Durable, Packable",Hiking,Clothing
+11,Garmin Forerunner 255,Running,Accessories,Advanced running watch with GPS,400.00,25,"GPS tracking, Heart rate monitor, Training features",Running,Gear
+12,GoPro Hero 12,Sports,Accessories,Action camera for capturing adventures,500.00,20,"4K video, Waterproof, Wide angle",Sports,Gear
+13,CamelBak Eddy+ Water Bottle,Running,Accessories,Insulated water bottle for hydration,35.00,80,"Insulated, Lightweight, Durable",Running,Gear
+14,Under Armour Compression Shorts,Running,Clothing,Comfortable compression wear,50.00,70,"Compression, Moisture-wicking, Comfortable",Running,Clothing
+15,Oakley Flak 2.0 XL Sunglasses,Sports,Accessories,Protective sports sunglasses,200.00,30,"UV protection, Durable, Lightweight",Sports,Gear
+16,Decathlon Running Backpack,Running,Accessories,Lightweight running backpack,40.00,60,"Lightweight, Multiple pockets, Comfortable",Running,Gear
+17,Cycling Jersey - Performance Pro,Cycling,Clothing,Aerodynamic cycling jersey,120.00,40,"Aerodynamic, Breathable, Lightweight",Cycling,Clothing
+18,Trek FX 3 Hybrid Bike Helmet,Cycling,Accessories,Safety helmet for cycling,80.00,50,"Durable, Comfortable fit, Safety certified",Cycling,Gear
+19,Shimano SPD-SL Pedals,Cycling,Accessories,Professional road cycling pedals,150.00,35,"Lightweight, Efficient, Durable",Cycling,Gear
+20,Yoga Mat Premium Non-Slip,Yoga,Accessories,6mm non-slip yoga mat,50.00,75,"Non-slip, Durable, Lightweight",Yoga,Gear
