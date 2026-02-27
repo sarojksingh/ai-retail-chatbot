@@ -28,6 +28,7 @@ export default function Register() {
       navigate("/");
     } catch (err) {
       alert("Registration failed");
+      console.log(err);
     }
   };
 

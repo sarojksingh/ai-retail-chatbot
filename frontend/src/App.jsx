@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProducts from "./pages/AdminProducts";
+
 import { isLoggedIn, logout } from "./utils/auth";
 
 import './App.css'
@@ -39,6 +41,7 @@ function App() {
         {loggedIn && (
           <>
             <Link to="/dashboard">Dashboard</Link> |{" "}
+            <Link to="/admin/products">Manage Products</Link> |{" "}
             <button onClick={handleLogout}>Logout</button>
           </>
         )}
@@ -52,6 +55,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/products"
+          element={
+            <ProtectedRoute>
+              <AdminProducts />
             </ProtectedRoute>
           }
         />
