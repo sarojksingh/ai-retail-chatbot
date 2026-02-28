@@ -18,8 +18,11 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 const productRoutes = require("./routes/productRoutes");
 app.use("/api/products", productRoutes);
 
+//Register Category routes
+const categoryRoutes = require("./routes/categoryRoutes");
+app.use("/api/categories", categoryRoutes);
+
 //Register Auth routes
 require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
-
 app.use("/api/auth", authRoutes);
