@@ -17,16 +17,27 @@ export default function ProductForm({
   });
 
   const [categories, setCategories] = useState([]);
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
   useEffect(() => {
+    
     if (editingProduct) {
-      setForm(editingProduct);
+      setForm({
+        // name: editingProduct.name || "",
+        // slug: editingProduct.slug || "",
+        // description: editingProduct.description || "",
+        // price: editingProduct.price || "",
+        // sku: editingProduct.sku || "",
+        // stockQuantity: editingProduct.stockQuantity || "",
+        ...editingProduct,
+        categoryId: editingProduct.categoryId || "",
+      });
     }
+
   }, [editingProduct]);
 
   const fetchCategories = async () => {
@@ -50,6 +61,10 @@ export default function ProductForm({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  //Auto generating slug value
+  const generateSlug = (name) =>
+    name.toLowerCase().replace(/\s+/g, "-");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -96,7 +111,7 @@ export default function ProductForm({
         <input name="description" placeholder="Description" value={form.description} onChange={handleChange} />
         <br />
 
-        <input name="price" placeholder="Price" value={form.price} onChange={handleChange} />
+        <input type="number" name="price" placeholder="Price" value={form.price} onChange={handleChange} />
         {errors.price && <p style={{color:"red"}}>{errors.price}</p>}
         <br />
 

@@ -7,13 +7,23 @@ export default function Login({ setLoggedIn }) {
     const navigate = useNavigate();
 
     const handleChange = (e) => {
+        
+        //console.log(e.target.name, e.target.value);
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        //console.log("form data:- %o", form.email);
+        //return false;
+        if (form.email === "" || form.password === "") {
+            alert("Please enter email & password to login!", "Error!");
+            return false;
+        }
+
         try {
+            console.log("form data:- %o", form);
             const res = await axios.post(
                 "http://localhost:5000/api/auth/login",
                 form

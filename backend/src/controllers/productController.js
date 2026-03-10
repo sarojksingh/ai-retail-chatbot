@@ -92,7 +92,10 @@ exports.createProduct = async (req, res) => {
         price: parseFloat(price) ,
         sku,
         stockQuantity: parseInt(stockQuantity),
-        categoryId,
+        //categoryId,
+        category: {
+          connect: { id: categoryId },
+        },
       },
     });
 
@@ -108,9 +111,47 @@ exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const updated = await prisma.product.update({
+    const {
+      name,
+      slug,
+      description,
+      price,
+      sku,
+      stockQuantity,
+      categoryId,
+    } = req.body;
+
+    // Basic validation
+    if (!name || !slug || !price || !categoryId) {
+      return res.status(400).json({ error: "Required fields missing" });
+    }
+
+    if (isNaN(price)) {
+      return res.status(400).json({ error: "Price must be number" });
+    }
+
+    if (!Number.isInteger(Number(stockQuantity))) {
+      return res.status(400).json({ error: "Stock must be integer" });
+    }
+
+    /*const updated = await prisma.product.update({
       where: { id },
       data: req.body,
+    });*/
+
+    const updated = await prisma.product.update({
+      where: { id },
+      data: {
+        name,
+        slug,
+        description,
+        price: parseFloat(price),
+        sku,
+        stockQuantity: parseInt(stockQuantity),
+        category: {
+          connect: { id: categoryId },
+        },
+      },
     });
 
     res.json(updated);
