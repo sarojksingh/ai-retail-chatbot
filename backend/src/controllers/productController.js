@@ -1,7 +1,7 @@
-const prisma = require("../prisma");
+import prisma from "../prisma.js";
 
 // Get all products with pagination + category filter
-exports.getProducts = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     const { page = 1, limit = 10, category } = req.query;
 
@@ -36,7 +36,7 @@ exports.getProducts = async (req, res) => {
 };
 
 // Get single product
-exports.getProductById = async (req, res) => {
+export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -59,7 +59,7 @@ exports.getProductById = async (req, res) => {
 };
 
 // Create product
-exports.createProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
     const {
       name,
@@ -107,7 +107,7 @@ exports.createProduct = async (req, res) => {
 };
 
 // Update product
-exports.updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -162,7 +162,7 @@ exports.updateProduct = async (req, res) => {
 };
 
 // Delete product
-exports.deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
 

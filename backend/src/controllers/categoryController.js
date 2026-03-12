@@ -1,6 +1,6 @@
-const prisma = require("../prisma");
+import prisma from "../prisma.js";
 
-exports.getCategories = async (req, res) => {
+export const getCategories = async (req, res) => {
   try {
     const categories = await prisma.category.findMany({
       orderBy: { name: "asc" },
@@ -12,7 +12,7 @@ exports.getCategories = async (req, res) => {
   }
 };
 
-exports.createCategory = async (req, res) => {
+export const createCategory = async (req, res) => {
   try {
     const { name, slug } = req.body;
 
