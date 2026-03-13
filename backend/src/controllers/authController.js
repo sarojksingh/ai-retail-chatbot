@@ -8,6 +8,7 @@ import {
   generateRefreshToken
 } from "../services/tokenService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
 
 //User Register function
 export const register = asyncHandler( async (req, res) => {
@@ -40,13 +41,15 @@ export const login = asyncHandler( async (req, res) => {
   });
 
   if (!user) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    //return res.status(401).json({ message: "Invalid credentials" });
+    throw new ApiError(401, "Invalid credentials");
   }
 
   const isValid = await bcrypt.compare(password, user.passwordHash);
 
   if (!isValid) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    //return res.status(401).json({ message: "Invalid credentials" });
+    throw new ApiError(401, "Invalid credentials");
   }
 
   const accessToken = generateAccessToken(user);
@@ -78,7 +81,8 @@ export const refreshToken = asyncHandler( async (req, res) => {
     const token = req.cookies.refreshToken;
 
     if (!token) {
-      return res.status(401).json({ message: "No refresh token" });
+      //return res.status(401).json({ message: "No refresh token" });
+      throw new ApiError(401, "No refresh token");
     }
 
     const storedToken = await prisma.refreshToken.findUnique({
@@ -86,11 +90,13 @@ export const refreshToken = asyncHandler( async (req, res) => {
     });
 
     if (!storedToken || storedToken.revoked) {
-      return res.status(403).json({ message: "Invalid refresh token" });
+      //return res.status(403).json({ message: "Invalid refresh token" });
+      throw new ApiError(403, "Invalid refresh token");
     }
 
     if (new Date() > storedToken.expiresAt) {
-      return res.status(403).json({ message: "Token expired" });
+      //return res.status(403).json({ message: "Token expired" });
+      throw new ApiError(403, "Token expired");
     }
 
     const user = await prisma.user.findUnique({
@@ -125,7 +131,8 @@ export const logout = asyncHandler( async (req, res) => {
     const token = req.cookies.refreshToken;
 
     if (!token) {
-      return res.status(400).json({ message: "No refresh token" });
+      //return res.status(400).json({ message: "No refresh token" });
+      throw new ApiError(400, "No refresh token");
     }
 
     await prisma.refreshToken.updateMany({
@@ -157,7 +164,8 @@ export const forgotPassword = asyncHandler( async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      //return res.status(404).json({ message: "User not found" });
+      throw new ApiError(404, "User not found!");
     }
 
     const token = crypto.randomBytes(32).toString("hex");
@@ -202,11 +210,13 @@ export const resetPassword = asyncHandler( async (req, res) => {
     });
 
     if (!storedToken) {
-      return res.status(400).json({ message: "Invalid reset token" });
+      //return res.status(400).json({ message: "Invalid reset token" });
+      throw new ApiError(400, "Invalid reset token");
     }
 
     if (new Date() > storedToken.expiresAt) {
-      return res.status(400).json({ message: "Reset token expired" });
+      //return res.status(400).json({ message: "Reset token expired" });
+      throw new ApiError(400, "Reset token expired");
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -231,4 +241,72 @@ export const resetPassword = asyncHandler( async (req, res) => {
 
 });
 
+//Email verification mail send
+export const sendVerificationEmail = asyncHandler(async (req, res) => {
+
+  const { email } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: { email }
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await prisma.emailVerificationToken.create({
+    data: {
+      token,
+      userId: user.id,
+      expiresAt
+    }
+  });
+
+  res.json({
+    message: "Verification token generated",
+    token
+  });
+
+  /*
+  // EMAIL SERVICE (future)
+  await sendVerificationEmail(user.email, token);
+  */
+
+});
+
+//Verify Email 
+export const verifyEmail = asyncHandler(async (req, res) => {
+
+  const { token } = req.body;
+
+  const storedToken = await prisma.emailVerificationToken.findUnique({
+    where: { token }
+  });
+
+  if (!storedToken) {
+    throw new ApiError(400, "Invalid verification token");
+  }
+
+  if (new Date() > storedToken.expiresAt) {
+    throw new ApiError(400, "Verification token expired");
+  }
+
+  await prisma.user.update({
+    where: { id: storedToken.userId },
+    data: { emailVerified: true }
+  });
+
+  await prisma.emailVerificationToken.delete({
+    where: { token }
+  });
+
+  res.json({
+    message: "Email verified successfully"
+  });
+
+});
 
