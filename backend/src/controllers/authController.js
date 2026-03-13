@@ -1,7 +1,8 @@
 
 import prisma from "../prisma.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import crypto from "crypto";
+//import jwt from "jsonwebtoken";
 import {
   generateAccessToken,
   generateRefreshToken
@@ -108,7 +109,7 @@ export const refreshToken = async (req, res) => {
     });
 
     return res.json({ accessToken });
-    
+
   } catch (error) {
     console.error("Refresh token error:-", error);
     return res.status(403).json({ error: "Invalid refresh token" });
@@ -142,6 +143,92 @@ export const logout = async (req, res) => {
     return res.status(500).json({ error: "Logout failed" });
 
   }
+};
+
+//Forgot password function
+export const forgotPassword = async (req, res) => {
+
+  try {
+
+    const { email } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await prisma.passwordResetToken.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt
+      }
+    });
+
+    // DEV MODE → return token
+    return res.json({
+      message: "Password reset token generated",
+      resetToken: token
+    });
+
+    /*
+    // PRODUCTION EMAIL (commented)
+    await sendResetEmail(user.email, token);
+    */
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Failed to generate reset token" });
+  }
+
+};
+
+//Reset password function
+export const resetPassword = async (req, res) => {
+
+  try {
+
+    const { token, newPassword } = req.body;
+
+    const storedToken = await prisma.passwordResetToken.findUnique({
+      where: { token }
+    });
+
+    if (!storedToken) {
+      return res.status(400).json({ message: "Invalid reset token" });
+    }
+
+    if (new Date() > storedToken.expiresAt) {
+      return res.status(400).json({ message: "Reset token expired" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: storedToken.userId },
+      data: { passwordHash: hashedPassword }
+    });
+
+    await prisma.passwordResetToken.delete({
+      where: { token }
+    });
+
+    return res.json({
+      message: "Password reset successful"
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Password reset failed" });
+  }
+
 };
 
 

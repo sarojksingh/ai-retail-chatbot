@@ -10,6 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  //url      = env("DATABASE_URL")
   url      = env("DATABASE_URL_TEST")
 }
 
@@ -22,10 +23,11 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  carts         Cart[]
-  orders        Order[]
-  chatSessions  ChatSession[]
-  refreshTokens RefreshToken[]
+  carts               Cart[]
+  orders              Order[]
+  chatSessions        ChatSession[]
+  refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Category {
@@ -145,4 +147,13 @@ model RefreshToken {
   revoked   Boolean  @default(false)
 
   @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

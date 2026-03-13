@@ -7,3 +7,10 @@ beforeAll(async () => {
 afterAll(async () => {
   await prisma.$disconnect();
 });
+
+//Reset refresh tokens after each test
+afterEach(async () => {
+  await prisma.refreshToken.deleteMany({ 
+    where: { revoked: true } 
+  });
+})
