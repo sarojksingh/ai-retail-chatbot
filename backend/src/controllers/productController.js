@@ -1,8 +1,9 @@
 import prisma from "../prisma.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 // Get all products with pagination + category filter
-export const getProducts = async (req, res) => {
-  try {
+export const getProducts = asyncHandler( async (req, res) => {
+  //try {
     const { page = 1, limit = 10, category } = req.query;
 
     const skip = (page - 1) * limit;
@@ -29,15 +30,15 @@ export const getProducts = async (req, res) => {
       limit: Number(limit),
       data: products,
     });
-  } catch (error) {
+  /*} catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch products" });
-  }
-};
+  }*/
+});
 
 // Get single product
-export const getProductById = async (req, res) => {
-  try {
+export const getProductById = asyncHandler( async (req, res) => {
+  //try {
     const { id } = req.params;
 
     const product = await prisma.product.findUnique({
@@ -53,14 +54,14 @@ export const getProductById = async (req, res) => {
     }
 
     res.json(product);
-  } catch (error) {
+  /*} catch (error) {
     res.status(500).json({ error: "Error fetching product" });
-  }
-};
+  }*/
+});
 
 // Create product
-export const createProduct = async (req, res) => {
-  try {
+export const createProduct = asyncHandler( async (req, res) => {
+  //try {
     const {
       name,
       slug,
@@ -100,15 +101,15 @@ export const createProduct = async (req, res) => {
     });
 
     res.status(201).json(product);
-  } catch (error) {
+  /*} catch (error) {
     console.error(error);
     res.status(400).json({ error: "Failed to create product" });
-  }
-};
+  }*/
+});
 
 // Update product
-export const updateProduct = async (req, res) => {
-  try {
+export const updateProduct = asyncHandler( async (req, res) => {
+  //try {
     const { id } = req.params;
 
     const {
@@ -155,15 +156,15 @@ export const updateProduct = async (req, res) => {
     });
 
     res.json(updated);
-  } catch (error) {
+  /*} catch (error) {
     res.status(400).json({ error: "Failed to update product" });
     console.error(error);
-  }
-};
+  }*/
+});
 
 // Delete product
-export const deleteProduct = async (req, res) => {
-  try {
+export const deleteProduct = asyncHandler( async (req, res) => {
+  //try {
     const { id } = req.params;
 
     await prisma.product.delete({
@@ -171,7 +172,7 @@ export const deleteProduct = async (req, res) => {
     });
 
     res.json({ message: "Product deleted" });
-  } catch (error) {
+  /*} catch (error) {
     res.status(400).json({ error: "Failed to delete product" });
-  }
-};
+  }*/
+});

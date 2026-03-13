@@ -7,14 +7,15 @@ import {
   generateAccessToken,
   generateRefreshToken
 } from "../services/tokenService.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 //User Register function
-export const register = async (req, res) => {
+export const register = asyncHandler( async (req, res) => {
   const { name, email, password } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  try {
+  //try {
     const user = await prisma.user.create({
       data: {
         name,
@@ -24,13 +25,13 @@ export const register = async (req, res) => {
     });
 
     res.json({ message: "User registered", user });
-  } catch (err) {
+  /*} catch (err) {
     res.status(400).json({ error: "Email already exists" });
-  }
-};
+  }*/
+});
 
 //Login function
-export const login = async (req, res) => {
+export const login = asyncHandler( async (req, res) => {
 
   const { email, password } = req.body;
 
@@ -67,12 +68,12 @@ export const login = async (req, res) => {
       role: user.role
     }
   });
-};
+});
 
 //Refresh token function
-export const refreshToken = async (req, res) => {
+export const refreshToken = asyncHandler( async (req, res) => {
 
-  try {
+  //try {
 
     const token = req.cookies.refreshToken;
 
@@ -110,16 +111,16 @@ export const refreshToken = async (req, res) => {
 
     return res.json({ accessToken });
 
-  } catch (error) {
+  /*} catch (error) {
     console.error("Refresh token error:-", error);
     return res.status(403).json({ error: "Invalid refresh token" });
-  }
-};
+  }*/
+});
 
 //Logout function
-export const logout = async (req, res) => {
+export const logout = asyncHandler( async (req, res) => {
 
-  try {
+  //try {
 
     const token = req.cookies.refreshToken;
 
@@ -137,18 +138,17 @@ export const logout = async (req, res) => {
     res.json({
       message: "Logged out successfully"
     });
-  }
-  catch(error) {
+  /*} catch(error) {
     console.error("Logout error:-", error);
     return res.status(500).json({ error: "Logout failed" });
 
-  }
-};
+  }*/
+});
 
 //Forgot password function
-export const forgotPassword = async (req, res) => {
+export const forgotPassword = asyncHandler( async (req, res) => {
 
-  try {
+  //try {
 
     const { email } = req.body;
 
@@ -183,17 +183,17 @@ export const forgotPassword = async (req, res) => {
     await sendResetEmail(user.email, token);
     */
 
-  } catch (error) {
+  /*} catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Failed to generate reset token" });
-  }
+  }*/
 
-};
+});
 
 //Reset password function
-export const resetPassword = async (req, res) => {
+export const resetPassword = asyncHandler( async (req, res) => {
 
-  try {
+  //try {
 
     const { token, newPassword } = req.body;
 
@@ -224,11 +224,11 @@ export const resetPassword = async (req, res) => {
       message: "Password reset successful"
     });
 
-  } catch (error) {
+  /*} catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Password reset failed" });
-  }
+  }*/
 
-};
+});
 
 
