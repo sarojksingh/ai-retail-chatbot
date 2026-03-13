@@ -1,4 +1,4 @@
-# AI Retail Chatbot
+# AI Retail Chatbot(As service) to Node and React application
 
 A conversational sales chatbot for retail/e-commerce that holds open-ended conversations, asks clarifying questions, and recommends products contextually using AI-powered RAG (Retrieval-Augmented Generation).
 
@@ -15,6 +15,7 @@ This project aims to build a scalable, customizable chatbot core that can be dep
 ## 📋 Features
 
 ### MVP (Current Phase)
+
 - [ ] Basic conversation engine with OpenAI integration
 - [ ] Product catalog ingestion (CSV format)
 - [ ] RAG implementation with product embeddings
@@ -25,6 +26,7 @@ This project aims to build a scalable, customizable chatbot core that can be dep
 - [ ] Simple web UI for testing
 
 ### Future Enhancements
+
 - [ ] Multi-channel integration (Shopify, WooCommerce)
 - [ ] Advanced upsell/cross-sell strategies
 - [ ] Analytics & conversion optimization
@@ -40,7 +42,7 @@ This project aims to build a scalable, customizable chatbot core that can be dep
 - **LLM**: OpenAI API (GPT-3.5/GPT-4)
 - **RAG**: LangChain + FAISS
 - **Database**: PostgreSQL / MySQL
-- **ORM**: SQLAlchemy
+- **ORM**: Prisma
 - **API Server**: Uvicorn
 
 ## 📁 Project Structure
@@ -100,6 +102,7 @@ ai-retail-chatbot/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Python 3.9+
 - PostgreSQL or MySQL
 - OpenAI API key
@@ -107,44 +110,52 @@ ai-retail-chatbot/
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/sarojksingh/ai-retail-chatbot.git
 cd ai-retail-chatbot
 ```
 
 2. Create virtual environment:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 4. Set up environment variables:
+
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
 5. Initialize database:
+
 ```bash
 python scripts/init_db.py
 ```
 
 6. Load product catalog:
+
 ```bash
 python scripts/load_products.py
 ```
 
 7. Generate embeddings:
+
 ```bash
 python scripts/generate_embeddings.py
 ```
 
 8. Run the application:
+
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -154,21 +165,25 @@ Visit `http://localhost:8000/docs` for API documentation.
 ## 📡 API Endpoints
 
 ### Chat Endpoints
+
 - `POST /api/chat` - Send message and get chatbot response
 - `GET /api/chat/history/{session_id}` - Get conversation history
 - `DELETE /api/chat/session/{session_id}` - Clear conversation
 
 ### Product Endpoints
+
 - `GET /api/products` - List products
 - `GET /api/products/{product_id}` - Get product details
 - `POST /api/products/search` - Search products
 
 ### Health Endpoints
+
 - `GET /health` - Health check
 
 ## 🗄️ Database Schema
 
 ### Key Tables
+
 - **users**: User authentication and profiles
 - **conversations**: Conversation sessions
 - **messages**: Individual messages in conversations
@@ -178,6 +193,7 @@ Visit `http://localhost:8000/docs` for API documentation.
 ## 🧠 RAG Implementation
 
 The chatbot uses FAISS for similarity search over product embeddings:
+
 1. Products are converted to embeddings using OpenAI's embedding model
 2. User queries are embedded and matched against product catalog
 3. Top-K similar products are retrieved and used in LLM context
@@ -185,6 +201,7 @@ The chatbot uses FAISS for similarity search over product embeddings:
 ## 🔐 Environment Configuration
 
 See `.env.example` for all configuration options. Key variables:
+
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `DATABASE_TYPE`: postgresql or mysql
 - `DB_*`: Database connection details
@@ -193,6 +210,7 @@ See `.env.example` for all configuration options. Key variables:
 ## 📝 Free LLM Alternatives
 
 If OpenAI API becomes unavailable, consider:
+
 - **Ollama**: Local LLM deployment (free, offline)
 - **Hugging Face Inference API**: Free tier available
 - **Anthropic Claude**: Freemium model
