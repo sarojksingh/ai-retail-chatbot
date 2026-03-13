@@ -7,6 +7,7 @@ import {
   generateRefreshToken
 } from "../services/tokenService.js";
 
+//User Register function
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -27,8 +28,7 @@ export const register = async (req, res) => {
   }
 };
 
-
-
+//Login function
 export const login = async (req, res) => {
 
   const { email, password } = req.body;
@@ -68,33 +68,80 @@ export const login = async (req, res) => {
   });
 };
 
+//Refresh token function
 export const refreshToken = async (req, res) => {
 
-  const token = req.cookies.refreshToken;
+  try {
 
-  if (!token) {
-    return res.status(401).json({ message: "No refresh token" });
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      return res.status(401).json({ message: "No refresh token" });
+    }
+
+    const storedToken = await prisma.refreshToken.findUnique({
+      where: { token }
+    });
+
+    if (!storedToken || storedToken.revoked) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    if (new Date() > storedToken.expiresAt) {
+      return res.status(403).json({ message: "Token expired" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: storedToken.userId }
+    });
+
+    // generate new tokens
+    const accessToken = generateAccessToken(user);
+    const newRefreshToken = await generateRefreshToken(user);
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      path: "/api/auth/refresh",
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    return res.json({ accessToken });
+    
+  } catch (error) {
+    console.error("Refresh token error:-", error);
+    return res.status(403).json({ error: "Invalid refresh token" });
   }
+};
 
-  const storedToken = await prisma.refreshToken.findUnique({
-    where: { token }
-  });
+//Logout function
+export const logout = async (req, res) => {
 
-  if (!storedToken || storedToken.revoked) {
-    return res.status(403).json({ message: "Invalid refresh token" });
+  try {
+
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      return res.status(400).json({ message: "No refresh token" });
+    }
+
+    await prisma.refreshToken.updateMany({
+      where: { token, revoked: false },
+      data: { revoked: true }
+    });
+
+    res.clearCookie("refreshToken");
+
+    res.json({
+      message: "Logged out successfully"
+    });
   }
+  catch(error) {
+    console.error("Logout error:-", error);
+    return res.status(500).json({ error: "Logout failed" });
 
-  if (new Date() > storedToken.expiresAt) {
-    return res.status(403).json({ message: "Token expired" });
   }
-
-  const user = await prisma.user.findUnique({
-    where: { id: storedToken.userId }
-  });
-
-  const accessToken = generateAccessToken(user);
-
-  res.json({ accessToken });
 };
 
 
