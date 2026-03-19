@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 import productRoutes from "./routes/productRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 import { apiLimiter } from "./middleware/rateLimitMiddleware.js";
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 app.use("/api", apiLimiter);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/cart", cartRoutes);
 app.use("/api/auth", authRoutes);
 
 // Export app for testing

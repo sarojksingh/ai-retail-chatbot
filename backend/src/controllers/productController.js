@@ -1,5 +1,6 @@
 import prisma from "../prisma.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asyncHandler.js"; //Used to handle try catch globally
+import { ApiError } from "../utils/ApiError.js";
 
 // Get all products with pagination + category filter
 export const getProducts = asyncHandler( async (req, res) => {
@@ -50,7 +51,8 @@ export const getProductById = asyncHandler( async (req, res) => {
     });
 
     if (!product) {
-      return res.status(404).json({ error: "Product not found" });
+      //return res.status(404).json({ error: "Product not found" });
+      throw new ApiError(404, "Product not found");
     }
 
     res.json(product);
@@ -74,15 +76,18 @@ export const createProduct = asyncHandler( async (req, res) => {
 
     // Basic validation
     if (!name || !slug || !price || !categoryId) {
-      return res.status(400).json({ error: "Required fields missing" });
+      //return res.status(400).json({ error: "Required fields missing" });
+      throw new ApiError(400, "Required fields missing");
     }
 
     if (isNaN(price)) {
-      return res.status(400).json({ error: "Price must be number" });
+      //return res.status(400).json({ error: "Price must be number" });
+      throw new ApiError(400, "Price must be number");
     }
 
     if (!Number.isInteger(Number(stockQuantity))) {
-      return res.status(400).json({ error: "Stock must be integer" });
+      //return res.status(400).json({ error: "Stock must be integer" });
+      throw new ApiError(400, "Stock must be integer");
     }
 
     const product = await prisma.product.create({
@@ -100,7 +105,9 @@ export const createProduct = asyncHandler( async (req, res) => {
       },
     });
 
-    res.status(201).json(product);
+    if (!product) throw new ApiError(400, "Failed to create product");
+    else 
+      res.status(201).json(product);
   /*} catch (error) {
     console.error(error);
     res.status(400).json({ error: "Failed to create product" });
@@ -124,15 +131,18 @@ export const updateProduct = asyncHandler( async (req, res) => {
 
     // Basic validation
     if (!name || !slug || !price || !categoryId) {
-      return res.status(400).json({ error: "Required fields missing" });
+      //return res.status(400).json({ error: "Required fields missing" });
+      throw new ApiError(400, "Required fields missing");
     }
 
     if (isNaN(price)) {
-      return res.status(400).json({ error: "Price must be number" });
+      //return res.status(400).json({ error: "Price must be number" });
+      throw new ApiError(400, "Price must be number");
     }
 
     if (!Number.isInteger(Number(stockQuantity))) {
-      return res.status(400).json({ error: "Stock must be integer" });
+      //return res.status(400).json({ error: "Stock must be integer" });
+      throw new ApiError(400, "Stock must be integer");
     }
 
     /*const updated = await prisma.product.update({
