@@ -2,9 +2,26 @@ import prisma from "../prisma.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
+const getUserIdFromRequest = (req) => req.user?.userId || req.user?.id;
+
+const getCartWithItems = async (tx, userId) => tx.cart.findUnique({
+  where: { userId },
+  include: {
+    items: {
+      include: {
+        product: true
+      }
+    }
+  }
+});
+
+const calculateCartTotal = (cartItems) => cartItems.reduce((sum, item) => (
+  sum + (item.product.price * item.quantity)
+), 0);
+
 export const createOrder = asyncHandler(async (req, res) => {
 
-  const userId = req.user?.userId || req.user?.id;
+  const userId = getUserIdFromRequest(req);
 
   if (!userId) {
     throw new ApiError(401, "Unauthorized");
@@ -13,16 +30,7 @@ export const createOrder = asyncHandler(async (req, res) => {
   const result = await prisma.$transaction(async (tx) => {
 
     // 1️⃣ Get cart with items
-    const cart = await tx.cart.findUnique({
-      where: { userId },
-      include: {
-        items: {
-          include: {
-            product: true
-          }
-        }
-      }
-    });
+    const cart = await getCartWithItems(tx, userId);
 
     if (!cart || cart.items.length === 0) {
       throw new ApiError(400, "Cart is empty");
@@ -39,11 +47,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     }
 
     // 3️⃣ Calculate total
-    let totalAmount = 0;
-
-    for (const item of cart.items) {
-      totalAmount += item.product.price * item.quantity;
-    }
+    const totalAmount = calculateCartTotal(cart.items);
 
     // 4️⃣ Create order
     const order = await tx.order.create({
@@ -83,14 +87,19 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   return res.json({
     message: "Order created successfully",
-    orderId: result.id
+    orderId: result.id,
+    order: {
+      id: result.id,
+      status: result.status,
+      paymentStatus: result.paymentStatus
+    }
   });
 
 });
 
 export const getOrders = asyncHandler(async (req, res) => {
 
-  const userId = req.user?.userId || req.user?.id;
+  const userId = getUserIdFromRequest(req);
 
   if (!userId) {
     throw new ApiError(401, "Unauthorized");
@@ -124,6 +133,41 @@ export const getOrders = asyncHandler(async (req, res) => {
         product: item.product
       }))
     }))
+  });
+
+});
+
+export const getCheckoutSummary = asyncHandler(async (req, res) => {
+
+  const userId = getUserIdFromRequest(req);
+
+  if (!userId) {
+    throw new ApiError(401, "Unauthorized");
+  }
+
+  const cart = await getCartWithItems(prisma, userId);
+
+  if (!cart || cart.items.length === 0) {
+    throw new ApiError(400, "Cart is empty");
+  }
+
+  const subtotal = calculateCartTotal(cart.items);
+
+  return res.json({
+    checkout: {
+      itemCount: cart.items.reduce((sum, item) => sum + item.quantity, 0),
+      subtotal,
+      totalAmount: subtotal,
+      currency: "INR",
+      paymentStatus: "PENDING",
+      items: cart.items.map(item => ({
+        productId: item.productId,
+        name: item.product.name,
+        quantity: item.quantity,
+        unitPrice: item.product.price,
+        lineTotal: item.product.price * item.quantity
+      }))
+    }
   });
 
 });
@@ -169,6 +213,60 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
   res.json({
     message: "Order status updated"
+  });
+
+});
+
+export const processOrderPayment = asyncHandler(async (req, res) => {
+
+  const userId = getUserIdFromRequest(req);
+  const { id } = req.params;
+  const { paymentStatus } = req.body;
+
+  const validPaymentStatuses = ["PENDING", "PAID", "FAILED"];
+
+  if (!validPaymentStatuses.includes(paymentStatus)) {
+    throw new ApiError(400, "Invalid payment status");
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { id }
+  });
+
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  if (order.userId !== userId && req.user?.role !== "Admin") {
+    throw new ApiError(403, "Not allowed to update payment for this order");
+  }
+
+  if (order.status === "CANCELLED") {
+    throw new ApiError(400, "Cannot pay for a cancelled order");
+  }
+
+  if (order.paymentStatus === "PAID" && paymentStatus !== "PAID") {
+    throw new ApiError(400, "Paid order payment status cannot be downgraded");
+  }
+
+  const data = { paymentStatus };
+
+  if (paymentStatus === "PAID" && order.status === "PENDING") {
+    data.status = "CONFIRMED";
+  }
+
+  const updatedOrder = await prisma.order.update({
+    where: { id },
+    data
+  });
+
+  return res.json({
+    message: "Payment processed successfully",
+    order: {
+      id: updatedOrder.id,
+      status: updatedOrder.status,
+      paymentStatus: updatedOrder.paymentStatus
+    }
   });
 
 });
