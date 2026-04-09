@@ -7,6 +7,9 @@ describe("Checkout - Create", () => {
 
   let token;
   let productId;
+  let checkoutId;
+
+  //console.log("hello"); return;
 
   it("should login", async () => {
     const res = await request(app)
@@ -19,6 +22,8 @@ describe("Checkout - Create", () => {
     token = res.body.accessToken;
     if (!token) throw new ApiError(400, "Login error!");
   });
+
+  //console.log("Login done!");
 
   it("should create checkout product", async () => {
 
@@ -45,12 +50,13 @@ describe("Checkout - Create", () => {
         stockQuantity: 100
       });
     
-    //console.log("product create:- ", res);
+    console.log("product create:- ", res);
     productId = res.body.id;
 
     if (!productId) 
       throw new ApiError(400, "Unable to create checkout Product!");
   });
+  //console.log("Checkout product created!");
 
   it("should add item to cart", async () => {
     const res = await request(app)
@@ -69,6 +75,7 @@ describe("Checkout - Create", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe("Item added to cart");
   });
+  //console.log("Items added to cart!");
 
   it("should create checkout session", async () => {
 
@@ -76,9 +83,24 @@ describe("Checkout - Create", () => {
       .post("/api/checkout")
       .set("Authorization", `Bearer ${token}`);
 
+    console.log("checkout session data, %o", res);
+    checkoutId = res.body.checkoutId;
+
     expect(res.statusCode).toBe(200);
     expect(res.body.checkoutId).toBeDefined();
 
   });
+
+
+  /*it("should confirm checkout and create order", async () => {
+
+    const res = await request(app)
+      .post(`/api/checkout/${checkoutId}/confirm`)
+      .set("Authorization", `Bearer ${token}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.orderId).toBeDefined();
+
+  });*/
 
 });
