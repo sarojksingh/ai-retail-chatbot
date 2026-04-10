@@ -50,7 +50,7 @@ describe("Checkout - Create", () => {
         stockQuantity: 100
       });
     
-    console.log("product create:- ", res);
+    //console.log("product create:- ", res);
     productId = res.body.id;
 
     if (!productId) 
@@ -83,7 +83,7 @@ describe("Checkout - Create", () => {
       .post("/api/checkout")
       .set("Authorization", `Bearer ${token}`);
 
-    console.log("checkout session data, %o", res);
+    //console.log("checkout session data, %o", res);
     checkoutId = res.body.checkoutId;
 
     expect(res.statusCode).toBe(200);
@@ -92,7 +92,7 @@ describe("Checkout - Create", () => {
   });
 
 
-  /*it("should confirm checkout and create order", async () => {
+  it("should confirm checkout and create order", async () => {
 
     const res = await request(app)
       .post(`/api/checkout/${checkoutId}/confirm`)
@@ -101,6 +101,6 @@ describe("Checkout - Create", () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.orderId).toBeDefined();
 
-  });*/
+  });
 
 });

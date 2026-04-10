@@ -9,6 +9,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import checkoutRoutes from "./routes/checkoutRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 import { apiLimiter } from "./middleware/rateLimitMiddleware.js";
 
@@ -37,6 +38,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/chat", chatRoutes);
 
 //Handle error - Must be added LAST
 app.use(errorHandler);
