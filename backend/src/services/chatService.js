@@ -1,30 +1,39 @@
 
+import { extractQuery, extractFilters, detectIntent } from "../utils/nlp.js";
 
-export const detectIntent = (message) => {
-
-  const msg = message.toLowerCase();
-
-  if (msg.includes("hi") || msg.includes("hello")) {
-    return { intent: "GREETING" };
-  }
-
-  if (msg.includes("show") || msg.includes("find")) {
+const formatProductResponse = (products) => {
+  if (!products.length) {
     return {
-      intent: "PRODUCT_SEARCH",
-      query: message
+      reply: "No products found 😕"
     };
   }
 
-  if (msg.includes("add")) {
-    return {
-      intent: "ADD_TO_CART",
-      query: message
-    };
+  return {
+    reply: "Here are some products:",
+    products: products.map(p => ({
+      id: p.id,
+      name: p.name,
+      price: p.price
+    }))
+  };
+};
+
+export const handleChat = async (message, userId, providers) => {
+  const { productProvider } = providers;
+
+  const intent = detectIntent(message);
+
+  if (intent === "search") {
+    const query = extractQuery(message);
+    const filters = extractFilters(message);
+
+    const products = await productProvider.search({
+      query,
+      filters
+    });
+
+    return formatProductResponse(products);
   }
 
-  if (msg.includes("cart")) {
-    return { intent: "VIEW_CART" };
-  }
-
-  return { intent: "UNKNOWN" };
+  return { reply: "Sorry, I didn't understand." };
 };

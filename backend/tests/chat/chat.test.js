@@ -26,4 +26,23 @@ describe("Chat API", () => {
     expect(res.body.intent).toBe("GREETING");
   });
 
+  it("should return products using provider", async () => {
+    const mockProvider = {
+      productProvider: {
+        search: jest.fn().mockResolvedValue([
+          { id: 1, name: "Shoes", price: 1500 }
+        ])
+      }
+    };
+
+    const res = await handleChat(
+      "shoes under 2000",
+      "user1",
+      mockProvider
+    );
+
+    expect(mockProvider.productProvider.search).toHaveBeenCalled();
+    expect(res.products.length).toBe(1);
+  });
+
 });
