@@ -1,5 +1,8 @@
 
-import { extractQuery, extractFilters, detectIntent } from "../utils/nlp.js";
+import { extractQuery, extractFilters, 
+  detectIntent, 
+  extractProductName 
+} from "../utils/nlp.js";
 
 const formatProductResponse = (products) => {
   if (!products.length) {
@@ -19,17 +22,42 @@ const formatProductResponse = (products) => {
 };
 
 export const handleChat = async (message, userId, providers) => {
-  const { productProvider } = providers;
+  const { productProvider, cartProvider } = providers;
 
   const intent = detectIntent(message);
 
+  //Add to cart
+
+  if (intent === "add_to_cart") {
+
+    const productName = extractProductName(message);
+
+    const product = await productProvider.findOneByName(productName);
+
+    if (!product) {
+      return {
+        reply: "Product not found! 😕"
+      };
+    }
+
+    await cartProvider.addItem(
+      userId,
+      product.id,
+      1
+    );
+
+    return {
+      reply: `${product.name} added to cart 🛒`
+    };
+  }
+
+  //Search product
   if (intent === "search") {
-    const query = extractQuery(message);
-    const filters = extractFilters(message);
+    //const query = extractQuery(message);
+    //const filters = extractFilters(message);
 
     const products = await productProvider.search({
-      query,
-      filters
+      query: message
     });
 
     return formatProductResponse(products);

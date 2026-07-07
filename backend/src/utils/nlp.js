@@ -11,7 +11,22 @@ export const extractFilters = (text) => {
   };
 };
 
+export const extractProductName = (text) => {
+  return text
+    .replace(/add/i, "")
+    .replace(/to cart/i, "")
+    .trim();
+}
+
 export const detectIntent = (text) => {
-  if (/buy|show|find/i.test(text)) return "search";
+
+  if (/add.*cart/i.test(text)) {
+    return "add_to_cart";
+  }
+
+  if (/buy|search|show|find/i.test(text)) { 
+    return "search"; 
+  }
+
   return "unknown";
 };

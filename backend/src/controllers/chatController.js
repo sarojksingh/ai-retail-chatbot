@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 //import { ApiError } from "../utils/ApiError.js";
 import { handleChat } from "../services/chatService.js";
 import { productProvider } from "../providers/productProvider.js";
+import { cartProvider } from "../providers/cartProvider.js";
 
 export const chatHandler = asyncHandler( async (req, res) => {
 
@@ -18,7 +19,8 @@ export const chatHandler = asyncHandler( async (req, res) => {
         message,
         req.user.id,
         {
-            productProvider
+            productProvider,
+            cartProvider
         }
     );
 

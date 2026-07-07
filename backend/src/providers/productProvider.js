@@ -24,5 +24,17 @@ export const productProvider = {
       },
       take: 5
     });
+  },
+
+  async findOneByName(name) {
+    return prisma.product.findFirst({
+      where: {
+        name: {
+          contains: name,
+          mode: "insensitive"
+        }
+      }
+    });
   }
+
 };
